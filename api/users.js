@@ -1,9 +1,10 @@
 const express = require('express');
+require('dotenv').config();
 const usersRouter = express.Router();
-const { getAllUsers } = require('../db');
-const JWT = require('jsonwebtoken')
+const { getAllUsers, getUserByUsername, createUser } = require('../db');
+const jwt = require('jsonwebtoken')
 const secret = process.env.JWT_SECRET;
-const token = jwt.sign({user, secret});
+
 
 
 usersRouter.use((req, res, next) => {
@@ -39,7 +40,9 @@ usersRouter.post('/login', async (req, res, next) => {
       const user = await getUserByUsername(username);
   
       if (user && user.password == password) {
-        // create token & return to user
+        console.log('user', user)
+        const {id, username} = user
+        const token = jwt.sign({id, username}, secret);
         res.send({ message: "you're logged in!", token });
       } else {
         next({ 
@@ -52,5 +55,43 @@ usersRouter.post('/login', async (req, res, next) => {
       next(error);
     }
   });
+
+
+  usersRouter.post('/register', async (req, res, next) => {
+    const { username, password, name, location } = req.body;
+  
+    try {
+      const _user = await getUserByUsername(username);
+  
+      if (_user) {
+        next({
+          name: 'UserExistsError',
+          message: 'A user by that username already exists'
+        });
+      }
+  
+      const user = await createUser({
+        username,
+        password,
+        name,
+        location,
+      });
+  
+      const token = jwt.sign({ 
+        id: user.id, 
+        username
+      }, process.env.JWT_SECRET, {
+        expiresIn: '1w'
+      });
+  
+      res.send({ 
+        message: "thank you for signing up",
+        token 
+      });
+    } catch ({ name, message }) {
+      next({ name, message })
+    } 
+  });
+
 
 module.exports = usersRouter;

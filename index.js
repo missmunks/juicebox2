@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 const PORT = 3000;
 const express = require('express');
 const server = express();
@@ -17,5 +17,5 @@ server.use('/api', apiRouter);
 server.listen(PORT, () => {
   console.log('The server is up on port', PORT)
 });
-console.log(process.env.JWT_SECRET)
 
+console.log(process.env.JWT_SECRET);
