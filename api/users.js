@@ -44,6 +44,7 @@ usersRouter.post('/login', async (req, res, next) => {
         const {id, username} = user
         const token = jwt.sign({id, username}, secret);
         res.send({ message: "you're logged in!", token });
+        console.log(token)
       } else {
         next({ 
           name: 'IncorrectCredentialsError', 

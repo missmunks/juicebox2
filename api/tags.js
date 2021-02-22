@@ -8,11 +8,13 @@ tagsRouter.use((req, res, next) => {
  next();
 });
 
-tagsRouter.get('/', async (req, res) => {
-    const tags = await getAllTags();
-    res.send({
-        tags
-    });
+tagsRouter.get('/', async (req, res, next) => {
+    try{
+        const tags = await getAllTags();
+        res.send({tags})
+    }catch ({name, message}) {
+        throw error({name, message})
+    }
 });
 
 module.exports = tagsRouter;
